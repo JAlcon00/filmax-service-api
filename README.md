@@ -1,17 +1,18 @@
 # filmax-service-api
 
-API backend del proyecto **FILMAX**, orientada a soportar el MVP de una plataforma de valoración de películas y series. Este repositorio corresponde a la capa de servidor y concentra la autenticación, la consulta de contenido, el registro de valoraciones y la persistencia de la actividad del usuario.
+API backend del proyecto **FILMAX**, orientada a soportar el MVP de una plataforma de valoración de películas y series. Este repositorio concentra la lógica de negocio del sistema: autenticación, consulta de catálogo, registro de valoraciones, administración de listas personales y persistencia de la actividad del usuario.
 
 ## Descripción del proyecto
 
-FILMAX es una solución web construida bajo enfoque Scrum para permitir que los usuarios:
+FILMAX es una solución web desarrollada bajo Scrum para permitir que los usuarios interactúen con un catálogo de películas y series mediante un flujo funcional mínimo pero completo:
 
-- Se registren en la plataforma.
-- Inicien sesión de forma segura.
-- Consulten el catálogo de películas y series.
-- Califiquen contenido con una escala de 1 a 5.
+- Registrar una cuenta.
+- Iniciar sesión de forma segura.
+- Buscar y visualizar contenido.
+- Guardar valoraciones y listas personales.
+- Consultar la información relacionada con su propia actividad.
 
-El alcance de esta versión prioriza el producto mínimo viable para validar el flujo principal de uso.
+El alcance de esta versión prioriza el producto mínimo viable para validar el comportamiento central del negocio.
 
 ## Stack tecnológico
 
@@ -22,38 +23,85 @@ El alcance de esta versión prioriza el producto mínimo viable para validar el 
 - API externa: IMDb API
 - Frontend asociado: Angular 19 / Tailwind CSS 19.x
 
-## Objetivo del sprint
+## Lógica de negocio
 
-El objetivo del sprint es entregar un primer incremento funcional del sistema que permita:
+La aplicación está diseñada alrededor de una experiencia de usuario simple y privada. El backend no solo expone endpoints, sino que aplica las reglas que determinan cómo se crea, consulta y protege la información del sistema.
 
-- Registrar usuarios.
-- Iniciar sesión.
-- Visualizar el catálogo de películas y series.
-- Emitir una calificación sobre el contenido.
+### 1. Identidad y autenticación
 
-## Historias de usuario del sprint
+- El usuario se registra con sus datos básicos y una contraseña segura.
+- La contraseña nunca se guarda en texto plano; se almacena como hash.
+- El inicio de sesión valida credenciales y emite un token JWT para identificar al usuario en las siguientes peticiones.
+- Las rutas protegidas requieren autenticación previa.
 
-- HU1: Registro de usuario
-- HU2: Inicio de sesión
-- HU3: Visualización del catálogo
-- HU4: Calificación de contenido
+### 2. Catálogo de películas y series
+
+- El catálogo se consume desde una API externa de IMDb.
+- El backend actúa como intermediario para evitar exponer credenciales sensibles en el frontend.
+- El sistema no mantiene una copia completa del catálogo en la base de datos local.
+- Solo se conserva el identificador del contenido necesario para relacionarlo con valoraciones y listas del usuario.
+- La información mostrada al usuario incluye los datos necesarios para explorar el contenido disponible, como título, descripción, año o género según la fuente externa.
+
+### 3. Valoraciones
+
+- Cada usuario puede calificar una película o serie con una escala de 1 a 5.
+- Solo se permiten valores enteros dentro de ese rango.
+- Un usuario solo puede tener una valoración por contenido.
+- Si el usuario vuelve a calificar el mismo elemento, la valoración se actualiza en lugar de duplicarse.
+- El sistema calcula el promedio de calificaciones por contenido para dar una referencia agregada.
+
+### 4. Listas personales
+
+- El usuario puede organizar contenido en listas privadas, como Favoritos y Watchlist, cuando esa funcionalidad forme parte del alcance activado.
+- Cada lista pertenece exclusivamente a su creador.
+- Agregar o eliminar un contenido de una lista no afecta a la otra.
+- El acceso a estas listas está restringido al usuario autenticado dueño de la información.
+
+### 5. Privacidad y control de acceso
+
+- Toda la actividad de usuario se consulta con verificación de propiedad.
+- Ningún usuario puede modificar valoraciones o listas de otro usuario.
+- Los datos sensibles del sistema se manejan exclusivamente en el backend.
+- La API key externa nunca debe exponerse desde el cliente.
+
+### 6. Persistencia de datos
+
+- Se almacenan usuarios, valoraciones y relaciones con contenido externo.
+- La base de datos local conserva solo la información necesaria para sostener la actividad del usuario.
+- El modelo busca evitar duplicidad, mantener trazabilidad y facilitar la consulta de la interacción histórica del usuario.
 
 ## Funcionalidades del backend
 
-- Autenticación con JWT.
+- Registro de usuarios.
+- Inicio de sesión con JWT.
 - Hashing de contraseñas con bcrypt.
-- Consulta del catálogo de películas y series.
-- Registro y actualización de calificaciones.
+- Búsqueda y consulta del catálogo mediante IMDb.
+- Registro y actualización de valoraciones.
 - Cálculo de promedios de valoración.
-- Persistencia de usuarios, contenido asociado y calificaciones.
+- Gestión de listas personales privadas.
+- Persistencia de usuarios, actividad y relaciones con contenido.
 
 ## Reglas de negocio
 
 - La escala de valoración es de 1 a 5 estrellas.
+- Solo se aceptan valores enteros en la calificación.
 - Un usuario solo puede tener una valoración por película o serie.
+- Las valoraciones se guardan con lógica de actualización para evitar duplicados.
 - El catálogo no se almacena completo localmente; se consulta desde la API externa y se guarda únicamente el identificador necesario para la actividad del usuario.
 - Las listas y valoraciones son privadas del usuario creador.
 - No se debe exponer la API key de IMDb en el frontend.
+- El backend debe validar propiedad y autenticación antes de permitir lectura o modificación de datos privados.
+
+## Modelo funcional del sistema
+
+El flujo principal del negocio se puede resumir así:
+
+1. El usuario crea una cuenta o inicia sesión.
+2. El backend valida la identidad y entrega un token.
+3. El usuario busca contenido en IMDb mediante el backend.
+4. El usuario califica una película o serie o la agrega a una lista personal.
+5. El backend guarda la relación entre el usuario y el contenido.
+6. El sistema calcula y expone promedios o historial según corresponda.
 
 ## Endpoints esperados
 
@@ -62,14 +110,42 @@ El objetivo del sprint es entregar un primer incremento funcional del sistema qu
 - `POST /ratings`
 - `GET /lists/:type`
 
-## Alcance fuera del sprint
+## Alcance fuera del MVP
 
 - Autenticación con terceros.
 - Streaming o reproducción de contenido.
-- Listas personales de favoritos.
+- Sincronización completa del catálogo en base de datos local.
 - Sistema de comentarios.
+- Funcionalidades de comunidad o interacción entre usuarios.
 
-## Equipo del proyecto
+## Componentes del proyecto
+
+El backend de FILMAX se organiza alrededor de los siguientes componentes funcionales:
+
+- Autenticación y autorización.
+- Consulta de catálogo externo.
+- Gestión de valoraciones.
+- Gestión de listas personales.
+- Persistencia de usuarios y actividad.
+- Integración con IMDb mediante backend proxy.
+
+## Estructura lógica de datos
+
+El sistema conserva únicamente la información necesaria para la operación del usuario y evita duplicar el catálogo completo en la base de datos local.
+
+Las entidades funcionales principales son:
+
+- Usuario: identidad, credenciales y relación con la actividad.
+- Rating: calificación asignada por un usuario a un contenido.
+- Personal list: relación entre un usuario y un contenido guardado como favorito o watchlist cuando esa funcionalidad esté habilitada.
+
+## Uso del proyecto
+
+Este repositorio sirve como base para el backend de FILMAX. Su objetivo es exponer la lógica de negocio, asegurar la integridad de los datos y servir como punto de integración con el frontend.
+
+## Colaboradores
+
+Este proyecto fue desarrollado por:
 
 - José de Jesús Almanza Contreras
 - Pablo Emilio Alonso Romero
@@ -77,22 +153,9 @@ El objetivo del sprint es entregar un primer incremento funcional del sistema qu
 - Jossué Amador Ynfante
 - Leonardo Gael Durán Torres
 
-### Roles del sprint
+## Documentación general
 
-- Product Owner: Pablo Emilio Alonso Romero
-- Scrum Master: José de Jesús Almanza Contreras
-- Frontend: Víctor Hassiel Ávila Monjaraz y Jossué Amador Ynfante
-- Backend: Leonardo Gael Durán Torres
-
-## Definición de terminado
-
-Una historia de usuario se considera terminada cuando:
-
-- La funcionalidad está implementada en frontend y backend.
-- La integración entre componentes funciona correctamente.
-- La funcionalidad fue probada sin errores críticos.
-- Cumple los criterios de aceptación.
-- Es utilizable dentro del flujo principal de la aplicación.
+Este README describe el proyecto como un backend orientado al control de autenticación, catálogo y actividad del usuario. Su propósito es documentar el comportamiento general del sistema y la lógica de negocio que lo sostiene.
 
 ## Inicio rápido
 
@@ -117,4 +180,4 @@ git push -u origin main
 
 ## Nota
 
-La documentación del sprint y de requerimientos proporcionada por el equipo fue consolidada en este README para dejar una base inicial del backend.
+La información de este README fue consolidada a partir de los requisitos funcionales y técnicos del proyecto para dejar una base inicial del backend.
