@@ -1,0 +1,30 @@
+node_modules/
+dist/
+coverage/
+.eslintcache
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Prisma local databases and generated artifacts
+prisma/dev.db
+prisma/dev.db-journal
+
+# Optional runtime and temp folders
+tmp/
+temp/

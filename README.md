@@ -165,6 +165,50 @@ Este README describe el proyecto como un backend orientado al control de autenti
 4. Ejecuta las migraciones de base de datos.
 5. Levanta el servidor de desarrollo.
 
+## Arquitectura de carpetas
+
+La base del proyecto quedó organizada con una estructura estándar por capas y por dominio funcional:
+
+```text
+prisma/
+src/
+	config/
+	middlewares/
+	routes/
+	modules/
+		auth/
+		movies/
+		ratings/
+		lists/
+		users/
+	utils/
+```
+
+La idea es separar la infraestructura común del negocio por módulos, para que autenticación, catálogo, valoraciones y listas crezcan sin mezclar responsabilidades.
+
+## Instalación de dependencias
+
+```bash
+npm install
+```
+
+Dependencias principales ya contempladas:
+
+- express, cors, helmet, morgan, express-rate-limit
+- dotenv, zod
+- bcrypt, jsonwebtoken
+- prisma, @prisma/client
+- typescript, tsx, eslint, prettier
+
+## Comandos base
+
+```bash
+npm run dev
+npm run build
+npm run prisma:generate
+npm run prisma:migrate
+```
+
 ## Flujo Git sugerido
 
 Este proyecto sigue una estrategia basada en Git Flow.
