@@ -22,3 +22,10 @@ export interface UpdateContentModelInput {
   type?: ContentType
   posterUrl?: string | null
 }
+
+export interface CatalogContentItem {
+  externalId: string
+  title: string
+  type: ContentType
+  posterUrl: string | null
+}

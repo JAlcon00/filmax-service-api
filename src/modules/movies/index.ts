@@ -1,4 +1,5 @@
 export type {
+  CatalogContentItem,
   ContentModel,
   ContentType,
   CreateContentModelInput,
