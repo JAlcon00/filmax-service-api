@@ -103,12 +103,209 @@ El flujo principal del negocio se puede resumir así:
 5. El backend guarda la relación entre el usuario y el contenido.
 6. El sistema calcula y expone promedios o historial según corresponda.
 
-## Endpoints esperados
+## Definición de Contratos API (IN-01)
 
-- `POST /auth/login`
-- `GET /movies/search`
-- `POST /ratings`
-- `GET /lists/:type`
+Para asegurar compatibilidad entre frontend y backend, se definieron contratos de solicitudes y respuestas en:
+
+- `src/contracts/api.contracts.ts`
+- `src/contracts/index.ts`
+
+Estos contratos usan `zod` para validación y también exportan tipos TypeScript para consumo desde capas de aplicación.
+
+## Registro de endpoints
+
+Base URL del backend:
+
+- `/api`
+
+Endpoints implementados actualmente:
+
+- `GET /health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/status`
+- `GET /api/users/status`
+- `GET /api/users/me`
+- `GET /api/movies/status`
+- `GET /api/movies/search`
+- `GET /api/ratings/status`
+- `POST /api/ratings`
+- `GET /api/ratings/average/:contentId`
+- `GET /api/lists/status`
+
+Endpoints funcionales esperados (MVP):
+
+- `GET /api/lists/:type`
+
+### Contratos principales
+
+1. Registro de usuario
+
+- Endpoint: `POST /api/auth/register`
+- Request:
+
+```json
+{
+	"name": "string",
+	"email": "string(email)",
+	"password": "string(min:8)"
+}
+```
+
+- Response `201`:
+
+```json
+{
+	"id": "string",
+	"name": "string",
+	"email": "string",
+	"createdAt": "date-time",
+	"updatedAt": "date-time"
+}
+```
+
+2. Login
+
+- Endpoint: `POST /api/auth/login`
+- Request:
+
+```json
+{
+	"email": "string(email)",
+	"password": "string(min:8)"
+}
+```
+
+- Response `200`:
+
+```json
+{
+	"accessToken": "string",
+	"tokenType": "bearer",
+	"expiresIn": "string",
+	"user": {
+		"id": "string",
+		"name": "string",
+		"email": "string",
+		"createdAt": "date-time",
+		"updatedAt": "date-time"
+	}
+}
+```
+
+3. Catálogo de películas y series
+
+- Endpoint: `GET /api/movies/search`
+- Query params:
+	- `q` opcional (`string`)
+	- `limit` opcional (`number` entre 1 y 100, default backend: 20)
+- Response `200`:
+
+```json
+{
+	"count": 0,
+	"items": [
+		{
+			"externalId": "string",
+			"title": "string",
+			"type": "movie|series",
+			"posterUrl": "string|null"
+		}
+	]
+}
+```
+
+4. Crear o actualizar calificación
+
+- Endpoint: `POST /api/ratings`
+- Requiere: `Authorization: Bearer <token>`
+- Request:
+
+```json
+{
+	"contentId": "string",
+	"score": 1,
+	"comment": "string(opcional)"
+}
+```
+
+- Response `201` (creado) o `200` (actualizado):
+
+```json
+{
+	"id": "string",
+	"score": 1,
+	"comment": "string|null",
+	"userId": "string",
+	"contentId": "string",
+	"createdAt": "date-time",
+	"updatedAt": "date-time"
+}
+```
+
+5. Promedio de calificaciones por contenido
+
+- Endpoint: `GET /api/ratings/average/:contentId`
+- Response `200`:
+
+```json
+{
+	"contentId": "string",
+	"averageScore": 0,
+	"totalRatings": 0
+}
+```
+
+6. Perfil autenticado
+
+- Endpoint: `GET /api/users/me`
+- Requiere: `Authorization: Bearer <token>`
+- Response `200`:
+
+```json
+{
+	"user": {
+		"id": "string",
+		"email": "string",
+		"name": "string(opcional)"
+	}
+}
+```
+
+7. Contrato previsto para listas personales (MVP)
+
+- Endpoint esperado: `GET /api/lists/:type`
+- Requiere: `Authorization: Bearer <token>`
+- `type`: `favorites | watchlist`
+- Response esperada `200`:
+
+```json
+{
+	"id": "string",
+	"name": "string",
+	"type": "favorites|watchlist",
+	"items": [
+		{
+			"contentId": "string",
+			"externalId": "string",
+			"title": "string",
+			"type": "movie|series",
+			"posterUrl": "string|null",
+			"addedAt": "date-time"
+		}
+	]
+}
+```
+
+8. Errores estándar
+
+- Estructura común:
+
+```json
+{
+	"message": "string"
+}
+```
 
 ## Alcance fuera del MVP
 
