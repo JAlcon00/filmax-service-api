@@ -1,0 +1,7 @@
+PORT=3000
+NODE_ENV=development
+DATABASE_URL="mysql://user:password@localhost:3306/filmax"
+JWT_SECRET="change-this-secret"
+JWT_EXPIRES_IN="1d"
+IMDB_API_KEY="change-this-key"
+IMDB_BASE_URL="https://imdb-api.com"
