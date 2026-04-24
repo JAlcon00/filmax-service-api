@@ -13,7 +13,11 @@
     "format": "prettier --write .",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx src/scripts/seed-imdb.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
