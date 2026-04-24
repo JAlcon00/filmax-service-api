@@ -66,11 +66,31 @@ export const moviesSearchResponseSchema = z.object({
   items: z.array(catalogContentItemSchema)
 })
 
-export const ratingsCreateRequestSchema = z.object({
-  contentId: z.string().trim().min(1),
-  score: z.number().int().min(1).max(10),
-  comment: z.string().trim().optional()
-})
+export const ratingsCreateRequestSchema = z
+  .object({
+    contentId: z.string().trim().min(1).optional(),
+    externalId: z.string().trim().min(1).optional(),
+    title: z.string().trim().min(1).optional(),
+    type: z.enum(['movie', 'series']).optional(),
+    posterUrl: z.string().url().nullable().optional(),
+    score: z.number().int().min(1).max(10),
+    comment: z.string().trim().optional()
+  })
+  .refine((payload) => Boolean(payload.contentId || payload.externalId), {
+    message: 'Debes enviar contentId o externalId'
+  })
+  .refine(
+    (payload) => {
+      if (!payload.externalId) {
+        return true
+      }
+
+      return Boolean(payload.title && payload.type)
+    },
+    {
+      message: 'Para externalId debes enviar title y type'
+    }
+  )
 
 export const ratingSchema = z.object({
   id: z.string(),
@@ -82,7 +102,15 @@ export const ratingSchema = z.object({
   updatedAt: z.coerce.date()
 })
 
-export const ratingsCreateResponseSchema = ratingSchema
+export const ratingsCreateResponseSchema = ratingSchema.extend({
+  content: z.object({
+    id: z.string(),
+    externalId: z.string(),
+    title: z.string(),
+    type: z.string(),
+    posterUrl: z.string().url().nullable()
+  })
+})
 
 export const ratingsAverageResponseSchema = z.object({
   contentId: z.string(),

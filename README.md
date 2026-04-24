@@ -223,11 +223,19 @@ Endpoints funcionales esperados (MVP):
 
 ```json
 {
-	"contentId": "string",
+	"contentId": "string(opcional)",
+	"externalId": "string(opcional)",
+	"title": "string(requerido si envías externalId)",
+	"type": "movie|series(requerido si envías externalId)",
+	"posterUrl": "string|null(opcional)",
 	"score": 1,
 	"comment": "string(opcional)"
 }
 ```
+
+- Regla de compatibilidad frontend-backend:
+	- Debes enviar `contentId` (cuando ya existe en BD) o `externalId` (del catálogo IMDb).
+	- Si envías `externalId`, el backend crea/actualiza automáticamente el registro de contenido.
 
 - Response `201` (creado) o `200` (actualizado):
 
@@ -239,7 +247,14 @@ Endpoints funcionales esperados (MVP):
 	"userId": "string",
 	"contentId": "string",
 	"createdAt": "date-time",
-	"updatedAt": "date-time"
+	"updatedAt": "date-time",
+	"content": {
+		"id": "string",
+		"externalId": "string",
+		"title": "string",
+		"type": "string",
+		"posterUrl": "string|null"
+	}
 }
 ```
 
