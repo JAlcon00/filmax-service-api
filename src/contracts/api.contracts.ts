@@ -118,6 +118,43 @@ export const ratingsAverageResponseSchema = z.object({
   totalRatings: z.number().int().nonnegative()
 })
 
+export const listsCreateRequestSchema = z.object({
+  name: z.string().trim().min(1),
+  type: z.enum(['favorites', 'watchlist'])
+})
+
+export const listsCreateResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['favorites', 'watchlist']),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date()
+})
+
+export const listItemCreateRequestSchema = z
+  .object({
+    contentId: z.string().trim().min(1).optional(),
+    externalId: z.string().trim().min(1).optional(),
+    title: z.string().trim().min(1).optional(),
+    type: z.enum(['movie', 'series']).optional(),
+    posterUrl: z.string().url().nullable().optional()
+  })
+  .refine((payload) => Boolean(payload.contentId || payload.externalId), {
+    message: 'Debes enviar contentId o externalId'
+  })
+  .refine(
+    (payload) => {
+      if (!payload.externalId) {
+        return true
+      }
+
+      return Boolean(payload.title && payload.type)
+    },
+    {
+      message: 'Para externalId debes enviar title y type'
+    }
+  )
+
 export const listsByTypeParamsSchema = z.object({
   type: z.enum(['favorites', 'watchlist'])
 })
@@ -130,6 +167,8 @@ export const listItemSchema = z.object({
   posterUrl: z.string().url().nullable(),
   addedAt: z.coerce.date()
 })
+
+export const listsAddItemResponseSchema = listItemSchema
 
 export const listsByTypeResponseSchema = z.object({
   id: z.string(),
@@ -151,5 +190,9 @@ export type MoviesSearchResponse = z.infer<typeof moviesSearchResponseSchema>
 export type RatingsCreateRequest = z.infer<typeof ratingsCreateRequestSchema>
 export type RatingsCreateResponse = z.infer<typeof ratingsCreateResponseSchema>
 export type RatingsAverageResponse = z.infer<typeof ratingsAverageResponseSchema>
+export type ListsCreateRequest = z.infer<typeof listsCreateRequestSchema>
+export type ListsCreateResponse = z.infer<typeof listsCreateResponseSchema>
+export type ListItemCreateRequest = z.infer<typeof listItemCreateRequestSchema>
+export type ListsAddItemResponse = z.infer<typeof listsAddItemResponseSchema>
 export type ListsByTypeParams = z.infer<typeof listsByTypeParamsSchema>
 export type ListsByTypeResponse = z.infer<typeof listsByTypeResponseSchema>
