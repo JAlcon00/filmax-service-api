@@ -52,3 +52,4 @@ prisma/dev.db-journal
 # Optional runtime and temp folders
 tmp/
 temp/
+node_modules
