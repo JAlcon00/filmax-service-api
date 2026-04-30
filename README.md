@@ -233,6 +233,7 @@ Endpoints funcionales esperados (MVP):
 }
 ```
 
+- La escala válida de `score` es de 1 a 5.
 - Regla de compatibilidad frontend-backend:
 	- Debes enviar `contentId` (cuando ya existe en BD) o `externalId` (del catálogo IMDb).
 	- Si envías `externalId`, el backend crea/actualiza automáticamente el registro de contenido.

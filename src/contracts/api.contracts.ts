@@ -73,7 +73,7 @@ export const ratingsCreateRequestSchema = z
     title: z.string().trim().min(1).optional(),
     type: z.enum(['movie', 'series']).optional(),
     posterUrl: z.string().url().nullable().optional(),
-    score: z.number().int().min(1).max(10),
+    score: z.number().int().min(1).max(5),
     comment: z.string().trim().optional()
   })
   .refine((payload) => Boolean(payload.contentId || payload.externalId), {
