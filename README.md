@@ -130,6 +130,8 @@ Endpoints implementados actualmente:
 - `GET /api/movies/search`
 - `GET /api/ratings/status`
 - `POST /api/ratings`
+- `GET /api/ratings/my`
+- `DELETE /api/ratings/:ratingId`
 - `GET /api/ratings/average/:contentId`
 - `GET /api/lists/status`
 

@@ -112,6 +112,54 @@ ratingsRouter.post(
 )
 
 ratingsRouter.get(
+  '/my',
+  authMiddleware,
+  asyncHandler(async (request: Request, response: Response) => {
+    const authRequest = request as AuthenticatedRequest
+
+    const ratings = (await prisma.rating.findMany({
+      where: {
+        userId: authRequest.user.id
+      },
+      include: {
+        content: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })) as Array<{
+      id: string
+      score: number
+      comment: string | null
+      userId: string
+      contentId: string
+      createdAt: Date
+      updatedAt: Date
+      content: {
+        id: string
+        externalId: string
+        title: string
+        type: string
+        posterUrl: string | null
+      }
+    }>
+
+    response.json(
+      ratings.map((rating) => ({
+        ...rating,
+        content: {
+          id: rating.content.id,
+          externalId: rating.content.externalId,
+          title: rating.content.title,
+          type: rating.content.type,
+          posterUrl: rating.content.posterUrl
+        }
+      }))
+    )
+  })
+)
+
+ratingsRouter.get(
   '/average/:contentId',
   asyncHandler(async (request: Request, response: Response) => {
     const contentIdSchema = z.string().trim().min(1, 'El contentId es requerido')

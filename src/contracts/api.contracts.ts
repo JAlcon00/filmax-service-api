@@ -112,6 +112,18 @@ export const ratingsCreateResponseSchema = ratingSchema.extend({
   })
 })
 
+export const ratingsMyResponseSchema = z.array(
+  ratingSchema.extend({
+    content: catalogContentItemSchema.extend({
+      id: z.string()
+    })
+  })
+)
+
+export const ratingsDeleteResponseSchema = z.object({
+  message: z.string()
+})
+
 export const ratingsAverageResponseSchema = z.object({
   contentId: z.string(),
   averageScore: z.number(),
@@ -189,6 +201,8 @@ export type MoviesSearchQuery = z.infer<typeof moviesSearchQuerySchema>
 export type MoviesSearchResponse = z.infer<typeof moviesSearchResponseSchema>
 export type RatingsCreateRequest = z.infer<typeof ratingsCreateRequestSchema>
 export type RatingsCreateResponse = z.infer<typeof ratingsCreateResponseSchema>
+export type RatingsMyResponse = z.infer<typeof ratingsMyResponseSchema>
+export type RatingsDeleteResponse = z.infer<typeof ratingsDeleteResponseSchema>
 export type RatingsAverageResponse = z.infer<typeof ratingsAverageResponseSchema>
 export type ListsCreateRequest = z.infer<typeof listsCreateRequestSchema>
 export type ListsCreateResponse = z.infer<typeof listsCreateResponseSchema>
