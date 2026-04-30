@@ -17,8 +17,8 @@ const createRatingSchema = z
     score: z
       .number()
       .int()
-      .min(1, 'La calificación debe ser un número entero entre 1 y 10')
-      .max(10, 'La calificación debe ser un número entero entre 1 y 10'),
+      .min(1, 'La calificación debe ser un número entero entre 1 y 5')
+      .max(5, 'La calificación debe ser un número entero entre 1 y 5'),
     comment: z.string().trim().optional()
   })
   .superRefine((value, context) => {
