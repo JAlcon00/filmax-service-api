@@ -10,7 +10,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(12),
   JWT_EXPIRES_IN: z.string().default('1d'),
   IMDB_API_KEY: z.string().min(1),
-  IMDB_BASE_URL: z.string().url().default('https://imdb-api.com')
+  IMDB_BASE_URL: z.string().url().default('https://www.omdbapi.com')
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
