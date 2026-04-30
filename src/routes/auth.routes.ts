@@ -1,7 +1,7 @@
 import type { Response } from 'express'
 import { Router } from 'express'
 import bcrypt from 'bcrypt'
-import { sign } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import type { StringValue } from 'ms'
 import { z } from 'zod'
 
@@ -102,7 +102,7 @@ authRouter.post(
       throw new HttpError(401, 'Credenciales inválidas')
     }
 
-    const accessToken = sign(
+    const accessToken = jwt.sign(
       {
         sub: user.id,
         email: user.email,

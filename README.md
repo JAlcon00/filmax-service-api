@@ -20,7 +20,7 @@ El alcance de esta versión prioriza el producto mínimo viable para validar el 
 - Base de datos: MySQL
 - ORM: Prisma 6.x
 - Seguridad: JWT y bcrypt
-- API externa: IMDb API
+- API externa: OMDb API
 - Frontend asociado: Angular 19 / Tailwind CSS 19.x
 
 ## Lógica de negocio
@@ -36,7 +36,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 
 ### 2. Catálogo de películas y series
 
-- El catálogo se consume desde una API externa de IMDb.
+- El catálogo se consume desde una API externa de OMDb.
 - El backend actúa como intermediario para evitar exponer credenciales sensibles en el frontend.
 - El sistema no mantiene una copia completa del catálogo en la base de datos local.
 - Solo se conserva el identificador del contenido necesario para relacionarlo con valoraciones y listas del usuario.
@@ -75,7 +75,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 - Registro de usuarios.
 - Inicio de sesión con JWT.
 - Hashing de contraseñas con bcrypt.
-- Búsqueda y consulta del catálogo mediante IMDb.
+- Búsqueda y consulta del catálogo mediante OMDb.
 - Registro y actualización de valoraciones.
 - Cálculo de promedios de valoración.
 - Gestión de listas personales privadas.
@@ -89,7 +89,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 - Las valoraciones se guardan con lógica de actualización para evitar duplicados.
 - El catálogo no se almacena completo localmente; se consulta desde la API externa y se guarda únicamente el identificador necesario para la actividad del usuario.
 - Las listas y valoraciones son privadas del usuario creador.
-- No se debe exponer la API key de IMDb en el frontend.
+- No se debe exponer la API key de OMDb en el frontend.
 - El backend debe validar propiedad y autenticación antes de permitir lectura o modificación de datos privados.
 
 ## Modelo funcional del sistema
@@ -98,7 +98,7 @@ El flujo principal del negocio se puede resumir así:
 
 1. El usuario crea una cuenta o inicia sesión.
 2. El backend valida la identidad y entrega un token.
-3. El usuario busca contenido en IMDb mediante el backend.
+3. El usuario busca contenido en OMDb mediante el backend.
 4. El usuario califica una película o serie o la agrega a una lista personal.
 5. El backend guarda la relación entre el usuario y el contenido.
 6. El sistema calcula y expone promedios o historial según corresponda.
@@ -237,7 +237,7 @@ Endpoints funcionales esperados (MVP):
 
 - La escala válida de `score` es de 1 a 5.
 - Regla de compatibilidad frontend-backend:
-	- Debes enviar `contentId` (cuando ya existe en BD) o `externalId` (del catálogo IMDb).
+	- Debes enviar `contentId` (cuando ya existe en BD) o `externalId` (del catálogo OMDb).
 	- Si envías `externalId`, el backend crea/actualiza automáticamente el registro de contenido.
 
 - Response `201` (creado) o `200` (actualizado):
@@ -342,7 +342,7 @@ El backend de FILMAX se organiza alrededor de los siguientes componentes funcion
 - Gestión de valoraciones.
 - Gestión de listas personales.
 - Persistencia de usuarios y actividad.
-- Integración con IMDb mediante backend proxy.
+- Integración con OMDb mediante backend proxy.
 
 ## Estructura lógica de datos
 

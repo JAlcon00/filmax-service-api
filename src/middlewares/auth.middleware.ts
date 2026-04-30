@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { verify, type JwtPayload } from 'jsonwebtoken'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
 
 import { env } from '../config/env.js'
 import { HttpError } from '../utils/errors.js'
@@ -27,7 +27,7 @@ export const authMiddleware = (
 
   let payload: JwtPayload
   try {
-    const decoded = verify(token, env.JWT_SECRET)
+    const decoded = jwt.verify(token, env.JWT_SECRET)
     if (typeof decoded === 'string') {
       throw new Error('Token inválido')
     }
