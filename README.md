@@ -20,7 +20,7 @@ El alcance de esta versión prioriza el producto mínimo viable para validar el 
 - Base de datos: MySQL
 - ORM: Prisma 6.x
 - Seguridad: JWT y bcrypt
-- API externa: IMDb API
+- API externa: OMDb API
 - Frontend asociado: Angular 19 / Tailwind CSS 19.x
 
 ## Lógica de negocio
@@ -36,7 +36,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 
 ### 2. Catálogo de películas y series
 
-- El catálogo se consume desde una API externa de IMDb.
+- El catálogo se consume desde una API externa de OMDb.
 - El backend actúa como intermediario para evitar exponer credenciales sensibles en el frontend.
 - El sistema no mantiene una copia completa del catálogo en la base de datos local.
 - Solo se conserva el identificador del contenido necesario para relacionarlo con valoraciones y listas del usuario.
@@ -75,7 +75,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 - Registro de usuarios.
 - Inicio de sesión con JWT.
 - Hashing de contraseñas con bcrypt.
-- Búsqueda y consulta del catálogo mediante IMDb.
+- Búsqueda y consulta del catálogo mediante OMDb.
 - Registro y actualización de valoraciones.
 - Cálculo de promedios de valoración.
 - Gestión de listas personales privadas.
@@ -89,7 +89,7 @@ La aplicación está diseñada alrededor de una experiencia de usuario simple y 
 - Las valoraciones se guardan con lógica de actualización para evitar duplicados.
 - El catálogo no se almacena completo localmente; se consulta desde la API externa y se guarda únicamente el identificador necesario para la actividad del usuario.
 - Las listas y valoraciones son privadas del usuario creador.
-- No se debe exponer la API key de IMDb en el frontend.
+- No se debe exponer la API key de OMDb en el frontend.
 - El backend debe validar propiedad y autenticación antes de permitir lectura o modificación de datos privados.
 
 ## Modelo funcional del sistema
@@ -98,17 +98,404 @@ El flujo principal del negocio se puede resumir así:
 
 1. El usuario crea una cuenta o inicia sesión.
 2. El backend valida la identidad y entrega un token.
-3. El usuario busca contenido en IMDb mediante el backend.
+3. El usuario busca contenido en OMDb mediante el backend.
 4. El usuario califica una película o serie o la agrega a una lista personal.
 5. El backend guarda la relación entre el usuario y el contenido.
 6. El sistema calcula y expone promedios o historial según corresponda.
 
-## Endpoints esperados
+## Definición de Contratos API (IN-01)
 
-- `POST /auth/login`
-- `GET /movies/search`
-- `POST /ratings`
-- `GET /lists/:type`
+Para asegurar compatibilidad entre frontend y backend, se definieron contratos de solicitudes y respuestas en:
+
+- `src/contracts/api.contracts.ts`
+- `src/contracts/index.ts`
+
+Estos contratos usan `zod` para validación y también exportan tipos TypeScript para consumo desde capas de aplicación.
+
+## Registro de endpoints
+
+Base URL del backend:
+
+- `/api`
+
+Endpoints implementados actualmente:
+
+- `GET /health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/status`
+- `GET /api/users/status`
+- `GET /api/users/me`
+- `GET /api/movies/status`
+- `GET /api/movies/search`
+- `GET /api/ratings/status`
+- `POST /api/ratings`
+- `GET /api/ratings/my`
+- `GET /api/ratings/average/:contentId`
+- `GET /api/lists/status`
+
+Endpoints funcionales esperados (MVP):
+
+- `GET /api/lists/:type`
+
+## Llamadas API
+
+Los siguientes ejemplos permiten probar los endpoints desde terminal usando `curl`.
+
+Base URL de producción:
+
+- `https://filmax-service-api.onrender.com`
+
+### 1. Estado del servidor
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/health"
+```
+
+### 2. Estado de autenticación
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/auth/status"
+```
+
+### 3. Registro de usuario
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/auth/register" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"name": "Usuario Test",
+		"email": "test@example.com",
+		"password": "password123"
+	}'
+```
+
+### 4. Login
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/auth/login" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"email": "test@example.com",
+		"password": "password123"
+	}'
+```
+
+### 5. Estado de usuarios
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/users/status"
+```
+
+### 6. Perfil autenticado
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/users/me" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 7. Estado de películas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/movies/status"
+```
+
+### 8. Buscar películas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/movies/search?q=The%20Matrix&limit=1"
+```
+
+### 9. Estado de ratings
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/status"
+```
+
+### 10. Crear o actualizar calificación
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/ratings" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"externalId": "tt0133093",
+		"title": "The Matrix",
+		"type": "movie",
+		"posterUrl": "https://...",
+		"score": 5,
+		"comment": "Excelente película"
+	}'
+```
+
+### 11. Obtener mis ratings
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/my" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 12. Eliminar rating por ID
+
+```bash
+curl -X DELETE "https://filmax-service-api.onrender.com/api/ratings/RATING_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+Nota: este endpoint está documentado como contrato del producto, pero no está expuesto en el código actual de este branch.
+
+### 13. Promedio de calificaciones por contenido
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/average/CONTENT_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 14. Estado de listas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/lists/status"
+```
+
+### 15. Crear lista personal
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/lists" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"type": "watchlist",
+		"name": "Mis películas favoritas"
+	}'
+```
+
+	### 16. Obtener lista por tipo
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/lists/watchlist" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+	### 17. Agregar item a lista
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/lists/watchlist/items" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"externalId": "tt0133093",
+		"title": "The Matrix",
+		"type": "movie",
+		"posterUrl": "https://..."
+	}'
+```
+
+### 18. Eliminar item de lista
+
+```bash
+curl -X DELETE "https://filmax-service-api.onrender.com/api/lists/watchlist/items/CONTENT_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 19. Respuesta estándar de error
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/route-inexistente"
+```
+
+La respuesta estándar esperada es:
+
+```json
+{
+	"message": "Route not found"
+}
+```
+
+### Contratos principales
+
+1. Registro de usuario
+
+- Endpoint: `POST /api/auth/register`
+- Request:
+
+```json
+{
+	"name": "string",
+	"email": "string(email)",
+	"password": "string(min:8)"
+}
+```
+
+- Response `201`:
+
+```json
+{
+	"id": "string",
+	"name": "string",
+	"email": "string",
+	"createdAt": "date-time",
+	"updatedAt": "date-time"
+}
+```
+
+2. Login
+
+- Endpoint: `POST /api/auth/login`
+- Request:
+
+```json
+{
+	"email": "string(email)",
+	"password": "string(min:8)"
+}
+```
+
+- Response `200`:
+
+```json
+{
+	"accessToken": "string",
+	"tokenType": "bearer",
+	"expiresIn": "string",
+	"user": {
+		"id": "string",
+		"name": "string",
+		"email": "string",
+		"createdAt": "date-time",
+		"updatedAt": "date-time"
+	}
+}
+```
+
+3. Catálogo de películas y series
+
+- Endpoint: `GET /api/movies/search`
+- Query params:
+	- `q` opcional (`string`)
+	- `limit` opcional (`number` entre 1 y 100, default backend: 20)
+- Response `200`:
+
+```json
+{
+	"count": 0,
+	"items": [
+		{
+			"externalId": "string",
+			"title": "string",
+			"type": "movie|series",
+			"posterUrl": "string|null"
+		}
+	]
+}
+```
+
+4. Crear o actualizar calificación
+
+- Endpoint: `POST /api/ratings`
+- Requiere: `Authorization: Bearer <token>`
+- Request:
+
+```json
+{
+	"contentId": "string(opcional)",
+	"externalId": "string(opcional)",
+	"title": "string(requerido si envías externalId)",
+	"type": "movie|series(requerido si envías externalId)",
+	"posterUrl": "string|null(opcional)",
+	"score": 1,
+	"comment": "string(opcional)"
+}
+```
+
+- La escala válida de `score` es de 1 a 5.
+- Regla de compatibilidad frontend-backend:
+	- Debes enviar `contentId` (cuando ya existe en BD) o `externalId` (del catálogo OMDb).
+	- Si envías `externalId`, el backend crea/actualiza automáticamente el registro de contenido.
+
+- Response `201` (creado) o `200` (actualizado):
+
+```json
+{
+	"id": "string",
+	"score": 1,
+	"comment": "string|null",
+	"userId": "string",
+	"contentId": "string",
+	"createdAt": "date-time",
+	"updatedAt": "date-time",
+	"content": {
+		"id": "string",
+		"externalId": "string",
+		"title": "string",
+		"type": "string",
+		"posterUrl": "string|null"
+	}
+}
+```
+
+5. Promedio de calificaciones por contenido
+
+- Endpoint: `GET /api/ratings/average/:contentId`
+- Response `200`:
+
+```json
+{
+	"contentId": "string",
+	"averageScore": 0,
+	"totalRatings": 0
+}
+```
+
+6. Perfil autenticado
+
+- Endpoint: `GET /api/users/me`
+- Requiere: `Authorization: Bearer <token>`
+- Response `200`:
+
+```json
+{
+	"user": {
+		"id": "string",
+		"email": "string",
+		"name": "string(opcional)"
+	}
+}
+```
+
+7. Contrato previsto para listas personales (MVP)
+
+- Endpoint esperado: `GET /api/lists/:type`
+- Requiere: `Authorization: Bearer <token>`
+- `type`: `favorites | watchlist`
+- Response esperada `200`:
+
+```json
+{
+	"id": "string",
+	"name": "string",
+	"type": "favorites|watchlist",
+	"items": [
+		{
+			"contentId": "string",
+			"externalId": "string",
+			"title": "string",
+			"type": "movie|series",
+			"posterUrl": "string|null",
+			"addedAt": "date-time"
+		}
+	]
+}
+```
+
+8. Errores estándar
+
+- Estructura común:
+
+```json
+{
+	"message": "string"
+}
+```
 
 ## Alcance fuera del MVP
 
@@ -127,7 +514,7 @@ El backend de FILMAX se organiza alrededor de los siguientes componentes funcion
 - Gestión de valoraciones.
 - Gestión de listas personales.
 - Persistencia de usuarios y actividad.
-- Integración con IMDb mediante backend proxy.
+- Integración con OMDb mediante backend proxy.
 
 ## Estructura lógica de datos
 
@@ -164,6 +551,50 @@ Este README describe el proyecto como un backend orientado al control de autenti
 3. Configura las variables de entorno.
 4. Ejecuta las migraciones de base de datos.
 5. Levanta el servidor de desarrollo.
+
+## Arquitectura de carpetas
+
+La base del proyecto quedó organizada con una estructura estándar por capas y por dominio funcional:
+
+```text
+prisma/
+src/
+	config/
+	middlewares/
+	routes/
+	modules/
+		auth/
+		movies/
+		ratings/
+		lists/
+		users/
+	utils/
+```
+
+La idea es separar la infraestructura común del negocio por módulos, para que autenticación, catálogo, valoraciones y listas crezcan sin mezclar responsabilidades.
+
+## Instalación de dependencias
+
+```bash
+npm install
+```
+
+Dependencias principales ya contempladas:
+
+- express, cors, helmet, morgan, express-rate-limit
+- dotenv, zod
+- bcrypt, jsonwebtoken
+- prisma, @prisma/client
+- typescript, tsx, eslint, prettier
+
+## Comandos base
+
+```bash
+npm run dev
+npm run build
+npm run prisma:generate
+npm run prisma:migrate
+```
 
 ## Flujo Git sugerido
 
