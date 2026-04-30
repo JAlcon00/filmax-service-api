@@ -11,6 +11,10 @@ import {
 
 export const listsRouter = Router()
 
+listsRouter.get('/status', (_request, response) => {
+  response.json({ module: 'lists', status: 'scaffold-ready' })
+})
+
 listsRouter.post('/', authMiddleware, asyncHandler(createListController))
 listsRouter.get('/:type', authMiddleware, asyncHandler(getListItemsController))
 listsRouter.post('/:type/items', authMiddleware, asyncHandler(addListItemController))
