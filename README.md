@@ -131,6 +131,10 @@ Endpoints implementados actualmente:
 - `GET /api/ratings/status`
 - `POST /api/ratings`
 - `GET /api/ratings/my`
+<<<<<<< HEAD
+=======
+- `DELETE /api/ratings/:ratingId`
+>>>>>>> origin/main
 - `GET /api/ratings/average/:contentId`
 - `GET /api/lists/status`
 
@@ -138,6 +142,7 @@ Endpoints funcionales esperados (MVP):
 
 - `GET /api/lists/:type`
 
+<<<<<<< HEAD
 ## Llamadas API
 
 Los siguientes ejemplos permiten probar los endpoints desde terminal usando `curl`.
@@ -311,6 +316,8 @@ La respuesta estándar esperada es:
 }
 ```
 
+=======
+>>>>>>> origin/main
 ### Contratos principales
 
 1. Registro de usuario
