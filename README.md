@@ -131,7 +131,10 @@ Endpoints implementados actualmente:
 - `GET /api/ratings/status`
 - `POST /api/ratings`
 - `GET /api/ratings/my`
+<<<<<<< HEAD
+=======
 - `DELETE /api/ratings/:ratingId`
+>>>>>>> origin/main
 - `GET /api/ratings/average/:contentId`
 - `GET /api/lists/status`
 
@@ -139,6 +142,182 @@ Endpoints funcionales esperados (MVP):
 
 - `GET /api/lists/:type`
 
+<<<<<<< HEAD
+## Llamadas API
+
+Los siguientes ejemplos permiten probar los endpoints desde terminal usando `curl`.
+
+Base URL de producción:
+
+- `https://filmax-service-api.onrender.com`
+
+### 1. Estado del servidor
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/health"
+```
+
+### 2. Estado de autenticación
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/auth/status"
+```
+
+### 3. Registro de usuario
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/auth/register" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"name": "Usuario Test",
+		"email": "test@example.com",
+		"password": "password123"
+	}'
+```
+
+### 4. Login
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/auth/login" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"email": "test@example.com",
+		"password": "password123"
+	}'
+```
+
+### 5. Estado de usuarios
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/users/status"
+```
+
+### 6. Perfil autenticado
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/users/me" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 7. Estado de películas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/movies/status"
+```
+
+### 8. Buscar películas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/movies/search?q=The%20Matrix&limit=1"
+```
+
+### 9. Estado de ratings
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/status"
+```
+
+### 10. Crear o actualizar calificación
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/ratings" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"externalId": "tt0133093",
+		"title": "The Matrix",
+		"type": "movie",
+		"posterUrl": "https://...",
+		"score": 5,
+		"comment": "Excelente película"
+	}'
+```
+
+### 11. Obtener mis ratings
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/my" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 12. Eliminar rating por ID
+
+```bash
+curl -X DELETE "https://filmax-service-api.onrender.com/api/ratings/RATING_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+Nota: este endpoint está documentado como contrato del producto, pero no está expuesto en el código actual de este branch.
+
+### 13. Promedio de calificaciones por contenido
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/ratings/average/CONTENT_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 14. Estado de listas
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/lists/status"
+```
+
+### 15. Crear lista personal
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/lists" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"type": "watchlist",
+		"name": "Mis películas favoritas"
+	}'
+```
+
+	### 16. Obtener lista por tipo
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/lists/watchlist" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+	### 17. Agregar item a lista
+
+```bash
+curl -X POST "https://filmax-service-api.onrender.com/api/lists/watchlist/items" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE" \
+	-d '{
+		"externalId": "tt0133093",
+		"title": "The Matrix",
+		"type": "movie",
+		"posterUrl": "https://..."
+	}'
+```
+
+### 18. Eliminar item de lista
+
+```bash
+curl -X DELETE "https://filmax-service-api.onrender.com/api/lists/watchlist/items/CONTENT_ID" \
+	-H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### 19. Respuesta estándar de error
+
+```bash
+curl -X GET "https://filmax-service-api.onrender.com/api/route-inexistente"
+```
+
+La respuesta estándar esperada es:
+
+```json
+{
+	"message": "Route not found"
+}
+```
+
+=======
+>>>>>>> origin/main
 ### Contratos principales
 
 1. Registro de usuario
