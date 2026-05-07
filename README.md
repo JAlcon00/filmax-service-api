@@ -606,12 +606,12 @@ npm run prisma:deploy
 
 ## Despliegue en Render
 
-El servidor aplica `prisma migrate deploy` antes de iniciar cuando `NODE_ENV=production`. Esto mantiene la base de datos sincronizada con las migrations del repositorio, por ejemplo la tabla `Comment` usada por `/api/comments`.
+El servidor aplica `prisma migrate deploy` antes de iniciar por defecto. Esto mantiene la base de datos sincronizada con las migrations del repositorio, por ejemplo la tabla `Comment` usada por `/api/comments`.
 
-Si el servicio no define `NODE_ENV=production`, configura esta variable en Render:
+Para desactivar este comportamiento en un entorno específico:
 
 ```bash
-RUN_MIGRATIONS_ON_START=true
+RUN_MIGRATIONS_ON_START=false
 ```
 
 Comandos recomendados:
