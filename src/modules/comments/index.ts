@@ -1,8 +1,8 @@
-export * from './models'
-export { CommentsService, commentsService } from './comments.service'
+export * from './models/index.js'
+export { CommentsService, commentsService } from './comments.service.js'
 export {
   createCommentController,
   getCommentsByContentController,
   updateCommentController,
   deleteCommentController
-} from './comments.controller'
+} from './comments.controller.js'
