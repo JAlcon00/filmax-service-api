@@ -210,3 +210,50 @@ export type ListItemCreateRequest = z.infer<typeof listItemCreateRequestSchema>
 export type ListsAddItemResponse = z.infer<typeof listsAddItemResponseSchema>
 export type ListsByTypeParams = z.infer<typeof listsByTypeParamsSchema>
 export type ListsByTypeResponse = z.infer<typeof listsByTypeResponseSchema>
+
+// Comments API Schemas
+export const commentAuthorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email()
+})
+
+export const commentCreateRequestSchema = z
+  .object({
+    text: z.string().trim().min(1, 'El texto es requerido').max(500, 'Máximo 500 caracteres'),
+    rating: z.number().int().min(1).max(5).optional(),
+    contentId: z.string().optional(),
+    externalId: z.string().optional(),
+    title: z.string().optional(),
+    type: z.string().optional()
+  })
+  .refine(
+    (data) => data.contentId || (data.externalId && data.title && data.type),
+    'Se requiere contentId o (externalId + title + type)'
+  )
+
+export const commentUpdateRequestSchema = z.object({
+  text: z.string().trim().min(1).max(500).optional(),
+  rating: z.number().int().min(1).max(5).optional()
+})
+
+export const commentResponseSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  rating: z.number().nullable(),
+  userId: z.string(),
+  contentId: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  author: commentAuthorSchema
+})
+
+export const commentsListResponseSchema = z.object({
+  comments: z.array(commentResponseSchema),
+  total: z.number()
+})
+
+export type CommentCreateRequest = z.infer<typeof commentCreateRequestSchema>
+export type CommentUpdateRequest = z.infer<typeof commentUpdateRequestSchema>
+export type CommentResponse = z.infer<typeof commentResponseSchema>
+export type CommentsListResponse = z.infer<typeof commentsListResponseSchema>
