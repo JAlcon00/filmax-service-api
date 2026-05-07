@@ -17,6 +17,7 @@ model User {
 
   ratings       Rating[]
   personalLists PersonalList[]
+  comments      Comment[]
 }
 
 model Content {
@@ -30,6 +31,7 @@ model Content {
 
   ratings   Rating[]
   listItems PersonalListItem[]
+  comments  Comment[]
 }
 
 model Rating {
@@ -71,4 +73,20 @@ model PersonalListItem {
   content      Content      @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
   @@unique([personalListId, contentId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String   @db.LongText
+  rating    Int?
+  userId    String
+  contentId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([contentId])
 }
