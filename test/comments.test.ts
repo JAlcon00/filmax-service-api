@@ -36,19 +36,8 @@ const generateToken = (userId: string = testUserId) => {
 }
 
 describe('E2E Comments API', () => {
-  let mockData = {
-    users: new Map(),
-    contents: new Map(),
-    comments: new Map()
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
-    mockData = {
-      users: new Map(),
-      contents: new Map(),
-      comments: new Map()
-    }
   })
 
   it('expone el status del módulo de comentarios', async () => {
@@ -238,6 +227,15 @@ describe('E2E Comments API', () => {
       }
     ]
 
+    vi.mocked(prisma.content.findFirst).mockResolvedValueOnce({
+      id: testContentId,
+      externalId: 'ext-123',
+      title: 'Test Movie',
+      type: 'movie',
+      posterUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
     vi.mocked(prisma.comment.findMany).mockResolvedValueOnce(comments)
     vi.mocked(prisma.comment.count).mockResolvedValueOnce(1)
 
@@ -254,7 +252,61 @@ describe('E2E Comments API', () => {
     })
   })
 
+  it('obtiene comentarios usando externalId de IMDb', async () => {
+    vi.mocked(prisma.content.findFirst).mockResolvedValueOnce({
+      id: testContentId,
+      externalId: 'tt0133093',
+      title: 'The Matrix',
+      type: 'movie',
+      posterUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
+    vi.mocked(prisma.comment.findMany).mockResolvedValueOnce([
+      {
+        id: 'comment-1',
+        text: 'Funciona con externalId',
+        rating: 5,
+        userId: testUserId,
+        contentId: testContentId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: { id: testUserId, name: 'User 1', email: 'user1@example.com' }
+      }
+    ])
+    vi.mocked(prisma.comment.count).mockResolvedValueOnce(1)
+
+    const response = await request(app).get('/api/comments/content/tt0133093')
+
+    expect(response.status).toBe(200)
+    expect(response.body.comments[0].text).toBe('Funciona con externalId')
+    expect(prisma.content.findFirst).toHaveBeenCalledWith({
+      where: {
+        OR: [{ id: 'tt0133093' }, { externalId: 'tt0133093' }]
+      }
+    })
+  })
+
+  it('retorna lista vacía si el contenido no existe al listar comentarios', async () => {
+    vi.mocked(prisma.content.findFirst).mockResolvedValueOnce(null)
+
+    const response = await request(app).get('/api/comments/content/unknown-content')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ comments: [], total: 0 })
+    expect(prisma.comment.findMany).not.toHaveBeenCalled()
+  })
+
   it('pagina los comentarios correctamente', async () => {
+    vi.mocked(prisma.content.findFirst).mockResolvedValueOnce({
+      id: testContentId,
+      externalId: 'ext-123',
+      title: 'Test Movie',
+      type: 'movie',
+      posterUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
     vi.mocked(prisma.comment.findMany).mockResolvedValueOnce([])
     vi.mocked(prisma.comment.count).mockResolvedValueOnce(0)
 

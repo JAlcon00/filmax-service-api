@@ -86,6 +86,7 @@ GET /api/comments/content/:contentId?limit=10&offset=0
 ```
 
 **Parámetros:**
+- `contentId`: acepta el ID interno del contenido o el `externalId` de IMDb (`tt...`)
 - `limit`: 1-100 (default: 10)
 - `offset`: >= 0 (default: 0)
 
