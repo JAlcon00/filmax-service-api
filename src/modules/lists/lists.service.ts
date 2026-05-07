@@ -9,15 +9,6 @@ import type {
   ListType
 } from './models/index.js'
 
-type ListRecord = {
-  id: string
-  name: string
-  type: string
-  userId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
 type ContentRecord = {
   id: string
   externalId: string

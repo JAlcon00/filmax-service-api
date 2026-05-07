@@ -601,6 +601,30 @@ npm run dev
 npm run build
 npm run prisma:generate
 npm run prisma:migrate
+npm run prisma:deploy
+```
+
+## Despliegue en Render
+
+El servidor aplica `prisma migrate deploy` antes de iniciar cuando `NODE_ENV=production`. Esto mantiene la base de datos sincronizada con las migrations del repositorio, por ejemplo la tabla `Comment` usada por `/api/comments`.
+
+Si el servicio no define `NODE_ENV=production`, configura esta variable en Render:
+
+```bash
+RUN_MIGRATIONS_ON_START=true
+```
+
+Comandos recomendados:
+
+```bash
+Build Command: npm install && npm run build
+Start Command: node dist/server.js
+```
+
+Para aplicar migrations manualmente:
+
+```bash
+npm run prisma:deploy
 ```
 
 ## Flujo Git sugerido

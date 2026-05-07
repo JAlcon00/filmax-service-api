@@ -9,7 +9,7 @@ export default [
     ignores: ['dist/**', 'node_modules/**', 'prisma/migrations/**']
   },
   {
-    files: ['**/*.ts'],
+    files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       globals: {
@@ -35,6 +35,36 @@ export default [
         }
       ],
       '@typescript-eslint/no-explicit-any': 'off'
+    }
+  },
+  {
+    files: ['test/**/*.ts', 'vitest.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly'
+      },
+      parserOptions: {
+        sourceType: 'module'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tseslint
+    },
+    rules: {
+      ...tseslint.configs.recommended.rules,
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly'
+      }
     }
   },
   prettierConfig

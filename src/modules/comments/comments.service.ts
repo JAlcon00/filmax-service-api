@@ -78,13 +78,26 @@ export class CommentsService {
   }
 
   async getCommentsByContent(
-    contentId: string,
+    contentKey: string,
     limit: number = 10,
     offset: number = 0
   ): Promise<{ comments: CommentResponseWithAuthor[]; total: number }> {
+    const content = await prisma.content.findFirst({
+      where: {
+        OR: [{ id: contentKey }, { externalId: contentKey }]
+      }
+    })
+
+    if (!content) {
+      return {
+        comments: [],
+        total: 0
+      }
+    }
+
     const [comments, total] = await Promise.all([
       prisma.comment.findMany({
-        where: { contentId },
+        where: { contentId: content.id },
         include: {
           user: {
             select: { id: true, name: true, email: true }
@@ -94,7 +107,7 @@ export class CommentsService {
         take: limit,
         skip: offset
       }),
-      prisma.comment.count({ where: { contentId } })
+      prisma.comment.count({ where: { contentId: content.id } })
     ])
 
     return {

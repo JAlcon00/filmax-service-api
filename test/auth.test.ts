@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { authRegisterRequestSchema, authLoginRequestSchema } from '../src/contracts/api.contracts'
+import { authRegisterRequestSchema } from '../src/contracts/api.contracts'
 import { sign, verify } from 'jsonwebtoken'
 import { mapPrismaErrorToHttp } from '../src/utils/prisma-errors'
 import { HttpError } from '../src/utils/errors'
