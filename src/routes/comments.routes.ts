@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { authMiddleware } from '@/middlewares/auth.middleware'
+import { authMiddleware } from '../middlewares/auth.middleware.js'
 import {
   createCommentController,
   getCommentsByContentController,
   updateCommentController,
   deleteCommentController
-} from '@/modules/comments'
+} from '../modules/comments/index.js'
 
 const router = Router()
 

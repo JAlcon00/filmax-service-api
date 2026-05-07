@@ -1,6 +1,6 @@
-import { prisma } from '@/config/prisma'
-import { HttpError } from '@/utils/errors'
-import type { CommentModel, CreateCommentInput, CommentResponseWithAuthor } from './models'
+import { prisma } from '../../config/prisma.js'
+import { HttpError } from '../../utils/errors.js'
+import type { CreateCommentInput, CommentResponseWithAuthor } from './models/index.js'
 
 export class CommentsService {
   async createComment(
@@ -48,7 +48,12 @@ export class CommentsService {
     let user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
       user = await prisma.user.create({
-        data: { id: userId, name: 'Unknown User', email: `user-${userId}@filmax.local` }
+        data: {
+          id: userId,
+          name: 'Unknown User',
+          email: `user-${userId}@filmax.local`,
+          passwordHash: 'external-auth-user'
+        }
       })
     }
 
