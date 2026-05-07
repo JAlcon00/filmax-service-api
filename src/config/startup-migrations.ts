@@ -3,14 +3,16 @@ import { access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 
-import { env } from './env.js'
-
 const execFileAsync = promisify(execFile)
 const DISABLED_VALUES = new Set(['0', 'false', 'no', 'off'])
 const ENABLED_VALUES = new Set(['1', 'true', 'yes', 'on'])
 
-const shouldRunMigrations = () => {
+export const shouldRunStartupMigrations = () => {
   const flag = process.env.RUN_MIGRATIONS_ON_START?.trim().toLowerCase()
+
+  if (process.env.NODE_ENV === 'test') {
+    return false
+  }
 
   if (flag && DISABLED_VALUES.has(flag)) {
     return false
@@ -20,7 +22,7 @@ const shouldRunMigrations = () => {
     return true
   }
 
-  return env.NODE_ENV === 'production'
+  return true
 }
 
 const resolvePrismaBinary = async () => {
@@ -33,7 +35,7 @@ const resolvePrismaBinary = async () => {
 }
 
 export const runPendingMigrations = async () => {
-  if (!shouldRunMigrations()) {
+  if (!shouldRunStartupMigrations()) {
     return
   }
 
