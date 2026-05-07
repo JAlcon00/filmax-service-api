@@ -34,3 +34,5 @@ export const createServer = () => {
 
   return app
 }
+
+export const app = createServer()

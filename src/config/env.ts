@@ -1,7 +1,10 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
-dotenv.config()
+// Cargar .env.test en ambiente de test, .env en otros ambientes
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env'
+dotenv.config({ path: envFile })
+dotenv.config() // Fallback a .env si el archivo específico no existe
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),

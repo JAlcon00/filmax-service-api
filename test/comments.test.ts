@@ -32,7 +32,7 @@ const testContentId = 'test-content-123'
 const testCommentId = 'test-comment-123'
 
 const generateToken = (userId: string = testUserId) => {
-  return jwt.sign({ id: userId }, 'your-secret-key', { expiresIn: '1h' })
+  return jwt.sign({ sub: userId, email: 'test@example.com', name: 'Test User' }, process.env.JWT_SECRET || 'test-secret-key-for-testing-only', { expiresIn: '1h' })
 }
 
 describe('E2E Comments API', () => {
@@ -80,6 +80,7 @@ describe('E2E Comments API', () => {
 
     vi.mocked(prisma.content.findFirst).mockResolvedValueOnce(null)
     vi.mocked(prisma.content.create).mockResolvedValueOnce(newContent)
+    vi.mocked(prisma.content.findUnique).mockResolvedValueOnce(newContent)
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
       id: testUserId,
       name: 'Test User',
